@@ -71,6 +71,8 @@ namespace ImageGenerator {
                     var options = new TextGraphicsOptions(true) {
                         ApplyKerning = true,
                         WrapTextWidth = dlbl.wrap,
+                        HorizontalAlignment = dlbl.ihalign,
+                        VerticalAlignment = dlbl.ivalign,
                     };
                     if(dlbl.blend != null) {
                         options.BlenderMode = dlbl.blend.itype;

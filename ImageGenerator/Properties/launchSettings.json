@@ -2,8 +2,8 @@
   "profiles": {
     "ImageGenerator": {
       "commandName": "Project",
-      "commandLineArgs": "-i MemeLicense.lua -o Output.png \"Yuuka.png\" \"Mijyuoon\" \"2018/07/31\"",
-      "workingDirectory": "D:\\_1"
+      "commandLineArgs": "-i MemeLicense.lua -o _Output.png \"Mijyuoon\" \"2018/07/31\" Yuuka.png Signature.png",
+      "workingDirectory": "D:\\WORK\\ImageGen"
     }
   }
 }

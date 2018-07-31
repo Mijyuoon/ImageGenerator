@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using MoonSharp.Interpreter;
+using SixLabors.Fonts;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.Primitives;
 
@@ -214,7 +215,35 @@ namespace ImageGenerator.Params {
 
         public Blend blend { get; set; }
 
-        public float wrap { get; set; } = -1f;
+        public float wrap { get; set; }
+
+        [MoonSharpHidden]
+        public HorizontalAlignment ihalign { get; set; }
+
+        public string halign {
+            get => ihalign.ToString().ToLower();
+            set {
+                value = value ?? default(HorizontalAlignment).ToString();
+                if(!Enum.TryParse<HorizontalAlignment>(value, true, out var result))
+                    throw new ScriptRuntimeException($"Value '{value}' is not valid horizontal alignment");
+
+                ihalign = result;
+            }
+        }
+
+        [MoonSharpHidden]
+        public VerticalAlignment ivalign { get; set; }
+
+        public string valign {
+            get => ivalign.ToString().ToLower();
+            set {
+                value = value ?? default(VerticalAlignment).ToString();
+                if(!Enum.TryParse<VerticalAlignment>(value, true, out var result))
+                    throw new ScriptRuntimeException($"Value '{value}' is not valid vertical alignment");
+
+                ivalign = result;
+            }
+        }
 
         [MoonSharpHidden]
         public Label() { /* Default constructor */ }
@@ -258,6 +287,18 @@ namespace ImageGenerator.Params {
                         .CheckType(nameof(Label), DataType.Number,
                             flags: TypeValidationFlags.AllowNil | TypeValidationFlags.AutoConvert)
                         .Number;
+
+            this.halign = table
+                          .Get(nameof(halign))
+                          .CheckType(nameof(Label), DataType.String,
+                              flags: TypeValidationFlags.AllowNil | TypeValidationFlags.AutoConvert)
+                          .String;
+
+            this.valign = table
+                          .Get(nameof(valign))
+                          .CheckType(nameof(Label), DataType.String,
+                              flags: TypeValidationFlags.AllowNil | TypeValidationFlags.AutoConvert)
+                          .String;
         }
 
         [MoonSharpHidden]
