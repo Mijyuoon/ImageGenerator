@@ -14,7 +14,7 @@ namespace ImageGenerator.Params {
         public float x { get; set; }
         public float y { get; set; }
 
-        public Vec dup() => new Vec { x = this.x, y = this.y };
+        public Vec dup() => new Vec { x = x, y = y };
 
         public static implicit operator Point(Vec that) => new Point((int)that.x, (int)that.y);
         public static implicit operator Size(Vec that) => new Size((int)that.x, (int)that.y);
@@ -58,6 +58,8 @@ namespace ImageGenerator.Params {
 
         public float fraction { get; set; } = 1.0f;
 
+        public Blend dup() => new Blend { itype = itype, fraction = fraction };
+
         [MoonSharpHidden]
         public Blend() { /* Default constructor */ }
 
@@ -86,6 +88,8 @@ namespace ImageGenerator.Params {
         public Vec size { get; set; }
 
         public Blend blend { get; set; }
+
+        public Image dup() => new Image { file = file, pos = pos, size = size, blend = blend };
 
         [MoonSharpHidden]
         public Image() { /* Default constructor */ }
@@ -129,6 +133,8 @@ namespace ImageGenerator.Params {
             get => icolor.Rgba;
             set => icolor = new Rgba32(value);
         }
+
+        public Brush dup() => new Brush { icolor = icolor };
         
         [MoonSharpHidden]
         public Brush() { /* Default constructor */ }
@@ -156,6 +162,8 @@ namespace ImageGenerator.Params {
         }
 
         public float width { get; set; } = 1f;
+
+        public Pen dup() => new Pen { icolor = icolor, width = width };
 
         [MoonSharpHidden]
         public Pen() { /* Default constructor */ }
@@ -197,6 +205,8 @@ namespace ImageGenerator.Params {
                 istyle = result;
             }
         }
+
+        public Font dup() => new Font { name = name, size = size, istyle = istyle };
 
         [MoonSharpHidden]
         public Font() { /* Default constructor */ }
@@ -266,6 +276,11 @@ namespace ImageGenerator.Params {
                 ivalign = result;
             }
         }
+
+        public Label dup() => new Label {
+            pos = pos, text = text, font = font, brush = brush, pen = pen,
+            blend = blend, wrap = wrap, ihalign = ihalign, ivalign = ivalign
+        };
 
         [MoonSharpHidden]
         public Label() { /* Default constructor */ }
