@@ -155,7 +155,7 @@ namespace ImageGenerator.Params {
             set => icolor = new Rgba32(value);
         }
 
-        public float width { get; set; }
+        public float width { get; set; } = 1f;
 
         [MoonSharpHidden]
         public Pen() { /* Default constructor */ }
@@ -184,10 +184,25 @@ namespace ImageGenerator.Params {
         public float size { get; set; }
 
         [MoonSharpHidden]
+        public FontStyle istyle { get; set; }
+
+        public string style {
+            get => istyle.ToString().ToLower();
+            set {
+                value = value ?? default(FontStyle).ToString();
+
+                if(!Enum.TryParse<FontStyle>(value, true, out var result))
+                    throw new ScriptRuntimeException($"Value '{value}' is not valid font style");
+
+                istyle = result;
+            }
+        }
+
+        [MoonSharpHidden]
         public Font() { /* Default constructor */ }
 
         [MoonSharpHidden]
-        public Font(DynValue name, DynValue size) {
+        public Font(DynValue name, DynValue size, DynValue style) {
             this.name = name
                         .CheckType(nameof(Font), DataType.String, 1)
                         .String;
@@ -195,10 +210,15 @@ namespace ImageGenerator.Params {
             this.size = (float)size
                         .CheckType(nameof(Font), DataType.Number, 2)
                         .Number;
+
+            if(style.Type == DataType.Void) return;
+            this.style = style
+                         .CheckType(nameof(Font), DataType.String, 3)
+                         .String;
         }
 
         [MoonSharpHidden]
-        public static Font Create(DynValue name, DynValue size) => new Font(name, size);
+        public static Font Create(DynValue name, DynValue size, DynValue style) => new Font(name, size, style);
     }
 
     [MoonSharpUserData]
@@ -224,6 +244,7 @@ namespace ImageGenerator.Params {
             get => ihalign.ToString().ToLower();
             set {
                 value = value ?? default(HorizontalAlignment).ToString();
+
                 if(!Enum.TryParse<HorizontalAlignment>(value, true, out var result))
                     throw new ScriptRuntimeException($"Value '{value}' is not valid horizontal alignment");
 
@@ -238,6 +259,7 @@ namespace ImageGenerator.Params {
             get => ivalign.ToString().ToLower();
             set {
                 value = value ?? default(VerticalAlignment).ToString();
+
                 if(!Enum.TryParse<VerticalAlignment>(value, true, out var result))
                     throw new ScriptRuntimeException($"Value '{value}' is not valid vertical alignment");
 

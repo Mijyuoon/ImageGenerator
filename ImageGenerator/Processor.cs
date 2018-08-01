@@ -64,7 +64,7 @@ namespace ImageGenerator {
 
                 // Draw labels
                 foreach(var dlbl in data.labels) {
-                    var font = new Font(GetFont(dlbl.font.name), dlbl.font.size);
+                    var font = new Font(GetFont(dlbl.font.name), dlbl.font.size, dlbl.font.istyle);
                     var brush = (dlbl.brush != null) ? Brushes.Solid(dlbl.brush.icolor) : null;
                     var pen = (dlbl.pen != null) ? Pens.Solid(dlbl.pen.icolor, dlbl.pen.width) : null;
 

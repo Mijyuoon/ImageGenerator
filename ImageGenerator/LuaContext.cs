@@ -45,7 +45,7 @@ namespace ImageGenerator {
             Lua.Globals["Image"] = (Func<DynValue, Params.Image>)Params.Image.Create;
             Lua.Globals["Brush"] = (Func<DynValue, Params.Brush>)Params.Brush.Create;
             Lua.Globals["Pen"] = (Func<DynValue, DynValue, Params.Pen>)Params.Pen.Create;
-            Lua.Globals["Font"] = (Func<DynValue, DynValue, Params.Font>)Params.Font.Create;
+            Lua.Globals["Font"] = (Func<DynValue, DynValue, DynValue, Params.Font>)Params.Font.Create;
             Lua.Globals["Label"] = (Func<DynValue, Params.Label>)Params.Label.Create;
 
             // Utility functions
