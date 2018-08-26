@@ -80,51 +80,6 @@ namespace ImageGenerator.Params {
     }
 
     [MoonSharpUserData]
-    class Image {
-        public string file { get; set; }
-
-        public Vec pos { get; set; }
-
-        public Vec size { get; set; }
-
-        public Blend blend { get; set; }
-
-        public Image dup() => new Image { file = file, pos = pos, size = size, blend = blend };
-
-        [MoonSharpHidden]
-        public Image() { /* Default constructor */ }
-
-        [MoonSharpHidden]
-        public Image(DynValue param) {
-            var table = param
-                        .CheckType(nameof(Image), DataType.Table, 1)
-                        .Table;
-
-            this.file = table
-                        .Get(nameof(file))
-                        .CheckType(nameof(Image), DataType.String)
-                        .String;
-
-            this.pos = table
-                       .Get(nameof(pos))
-                       .CheckUserDataType<Vec>(nameof(Image));
-
-            this.size = table
-                        .Get(nameof(size))
-                        .CheckUserDataType<Vec>(nameof(Image),
-                            flags: TypeValidationFlags.AllowNil);
-
-            this.blend = table
-                         .Get(nameof(blend))
-                         .CheckUserDataType<Blend>(nameof(Image),
-                             flags: TypeValidationFlags.AllowNil);
-        }
-
-        [MoonSharpHidden]
-        public static Image Create(DynValue param) => new Image(param);
-    }
-
-    [MoonSharpUserData]
     class Brush {
         [MoonSharpHidden]
         public Rgba32 icolor { get; set; }
@@ -232,9 +187,55 @@ namespace ImageGenerator.Params {
     }
 
     [MoonSharpUserData]
-    class Label {
+    class DrawObject {
         public Vec pos { get; set; }
+    }
 
+    [MoonSharpUserData]
+    class Image : DrawObject {
+        public string file { get; set; }
+
+        public Vec size { get; set; }
+
+        public Blend blend { get; set; }
+
+        public Image dup() => new Image { file = file, pos = pos, size = size, blend = blend };
+
+        [MoonSharpHidden]
+        public Image() { /* Default constructor */ }
+
+        [MoonSharpHidden]
+        public Image(DynValue param) {
+            var table = param
+                        .CheckType(nameof(Image), DataType.Table, 1)
+                        .Table;
+
+            this.file = table
+                        .Get(nameof(file))
+                        .CheckType(nameof(Image), DataType.String)
+                        .String;
+
+            this.pos = table
+                       .Get(nameof(pos))
+                       .CheckUserDataType<Vec>(nameof(Image));
+
+            this.size = table
+                        .Get(nameof(size))
+                        .CheckUserDataType<Vec>(nameof(Image),
+                            flags: TypeValidationFlags.AllowNil);
+
+            this.blend = table
+                         .Get(nameof(blend))
+                         .CheckUserDataType<Blend>(nameof(Image),
+                             flags: TypeValidationFlags.AllowNil);
+        }
+
+        [MoonSharpHidden]
+        public static Image Create(DynValue param) => new Image(param);
+    }
+
+    [MoonSharpUserData]
+    class Label : DrawObject {
         public string text { get; set; }
 
         public Font font { get; set; }
@@ -346,9 +347,7 @@ namespace ImageGenerator.Params {
     class Main {
         public string background { get; set; }
 
-        public List<Image> images { get; set; }
-
-        public List<Label> labels { get; set; }
+        public List<DrawObject> objects { get; set; }
 
         public List<string> fonts { get; set; }
 
@@ -366,21 +365,13 @@ namespace ImageGenerator.Params {
                               .CheckType(nameof(Main), DataType.String)
                               .String;
 
-            this.images = table
-                          .Get(nameof(images))
-                          .CheckType(nameof(Main), DataType.Table,
-                              flags: TypeValidationFlags.AllowNil)
-                          .Table
-                          ?.GetArrayUserData<Image>(nameof(Main))
-                          ?.ToList();
-
-            this.labels = table
-                          .Get(nameof(labels))
-                          .CheckType(nameof(Main), DataType.Table,
-                              flags: TypeValidationFlags.AllowNil)
-                          .Table
-                          ?.GetArrayUserData<Label>(nameof(Main))
-                          ?.ToList();
+            this.objects = table
+                           .Get(nameof(objects))
+                           .CheckType(nameof(Main), DataType.Table,
+                               flags: TypeValidationFlags.AllowNil)
+                           .Table
+                           ?.GetArrayUserData<DrawObject>(nameof(Main))
+                           ?.ToList();
 
             this.fonts = table
                          .Get(nameof(fonts))

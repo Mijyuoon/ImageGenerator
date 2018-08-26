@@ -45,41 +45,44 @@ namespace ImageGenerator {
             }
 
             CurrentImage.Mutate(ctx => {
-                // Draw images
-                foreach(var dimg in data.images) {
-                    using(var image = Image.Load<Rgba32>(GetActualPath(dimg.file))) {
-                        if(dimg.size != null) {
-                            image.Mutate(im => im.Resize(dimg.size, KnownResamplers.Bicubic, false));
+                foreach(var dobj in data.objects) {
+
+                    // Draw images
+                    if(dobj is Params.Image dimg) {
+                        using(var image = Image.Load<Rgba32>(GetActualPath(dimg.file))) {
+                            if(dimg.size != null) {
+                                image.Mutate(im => im.Resize(dimg.size, KnownResamplers.Bicubic, false));
+                            }
+
+                            var options = new GraphicsOptions(true);
+                            if(dimg.blend != null) {
+                                options.BlenderMode = dimg.blend.itype;
+                                options.BlendPercentage = dimg.blend.fraction;
+                            }
+
+                            ctx.DrawImage(options, image, dimg.pos);
                         }
-
-                        var options = new GraphicsOptions(true);
-                        if(dimg.blend != null) {
-                            options.BlenderMode = dimg.blend.itype;
-                            options.BlendPercentage = dimg.blend.fraction;
-                        }
-
-                        ctx.DrawImage(options, image, dimg.pos);
-                    }
-                }
-
-                // Draw labels
-                foreach(var dlbl in data.labels) {
-                    var font = new Font(GetFont(dlbl.font.name), dlbl.font.size, dlbl.font.istyle);
-                    var brush = (dlbl.brush != null) ? Brushes.Solid(dlbl.brush.icolor) : null;
-                    var pen = (dlbl.pen != null) ? Pens.Solid(dlbl.pen.icolor, dlbl.pen.width) : null;
-
-                    var options = new TextGraphicsOptions(true) {
-                        ApplyKerning = true,
-                        WrapTextWidth = dlbl.wrap,
-                        HorizontalAlignment = dlbl.ihalign,
-                        VerticalAlignment = dlbl.ivalign,
-                    };
-                    if(dlbl.blend != null) {
-                        options.BlenderMode = dlbl.blend.itype;
-                        options.BlendPercentage = dlbl.blend.fraction;
                     }
 
-                    ctx.DrawText(options, dlbl.text, font, brush, pen, dlbl.pos);
+                    // Draw labels
+                    if(dobj is Params.Label dlbl) {
+                        var font = new Font(GetFont(dlbl.font.name), dlbl.font.size, dlbl.font.istyle);
+                        var brush = (dlbl.brush != null) ? Brushes.Solid(dlbl.brush.icolor) : null;
+                        var pen = (dlbl.pen != null) ? Pens.Solid(dlbl.pen.icolor, dlbl.pen.width) : null;
+
+                        var options = new TextGraphicsOptions(true) {
+                            ApplyKerning = true,
+                            WrapTextWidth = dlbl.wrap,
+                            HorizontalAlignment = dlbl.ihalign,
+                            VerticalAlignment = dlbl.ivalign,
+                        };
+                        if(dlbl.blend != null) {
+                            options.BlenderMode = dlbl.blend.itype;
+                            options.BlendPercentage = dlbl.blend.fraction;
+                        }
+
+                        ctx.DrawText(options, dlbl.text, font, brush, pen, dlbl.pos);
+                    }
                 }
             });
         }

@@ -31,7 +31,7 @@ namespace ImageGenerator {
             Lua = new Script(CoreModules.Basic |
                              CoreModules.Bit32 |
                              CoreModules.ErrorHandling |
-                             // CoreModules.IO |
+                             CoreModules.IO |
                              CoreModules.Math |
                              CoreModules.Metatables |
                              CoreModules.OS_Time |
