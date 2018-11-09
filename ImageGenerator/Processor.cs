@@ -1,20 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Processing.Drawing;
-using SixLabors.ImageSharp.Processing.Drawing.Brushes;
-using SixLabors.ImageSharp.Processing.Drawing.Pens;
-using SixLabors.ImageSharp.Processing.Text;
-using SixLabors.ImageSharp.Processing.Transforms;
-using SixLabors.Primitives;
-using Params = ImageGenerator.Params;
 
 namespace ImageGenerator {
     class ProcessorException : Exception {
@@ -22,6 +12,21 @@ namespace ImageGenerator {
     }
 
     class Processor {
+        public class Context {
+            private Processor processor;
+
+            public IImageProcessingContext<Rgba32> Target { get; }
+
+            public Context(Processor proc, IImageProcessingContext<Rgba32> target) {
+                this.processor = proc;
+                this.Target = target;
+            }
+
+            public FontFamily GetFont(string name) => processor.GetFont(name);
+
+            public string ExpandPath(string path) => processor.ExpandPath(path);
+        }
+
         public string TemplateDir { get; set; }
 
         public Image<Rgba32> CurrentImage { get; private set; }
@@ -35,54 +40,21 @@ namespace ImageGenerator {
 
         public void ProcessParams(Params.Main data) {
             CurrentImage?.Dispose();
-            CurrentImage = Image.Load<Rgba32>(GetActualPath(data.background));
+            CurrentImage = Image.Load<Rgba32>(ExpandPath(data.background));
 
             if(data.fonts != null) {
                 // Load fonts
                 foreach(var font in data.fonts) {
-                    FontCache.Install(GetActualPath(font));
+                    FontCache.Install(ExpandPath(font));
                 }
             }
 
             CurrentImage.Mutate(ctx => {
+                // Draw all drawable objects
+                var imageCtx = new Context(this, ctx);
+
                 foreach(var dobj in data.objects) {
-
-                    // Draw images
-                    if(dobj is Params.Image dimg) {
-                        using(var image = Image.Load<Rgba32>(GetActualPath(dimg.file))) {
-                            if(dimg.size != null) {
-                                image.Mutate(im => im.Resize(dimg.size, KnownResamplers.Bicubic, false));
-                            }
-
-                            var options = new GraphicsOptions(true);
-                            if(dimg.blend != null) {
-                                options.BlenderMode = dimg.blend.itype;
-                                options.BlendPercentage = dimg.blend.fraction;
-                            }
-
-                            ctx.DrawImage(options, image, dimg.pos);
-                        }
-                    }
-
-                    // Draw labels
-                    if(dobj is Params.Label dlbl) {
-                        var font = new Font(GetFont(dlbl.font.name), dlbl.font.size, dlbl.font.istyle);
-                        var brush = (dlbl.brush != null) ? Brushes.Solid(dlbl.brush.icolor) : null;
-                        var pen = (dlbl.pen != null) ? Pens.Solid(dlbl.pen.icolor, dlbl.pen.width) : null;
-
-                        var options = new TextGraphicsOptions(true) {
-                            ApplyKerning = true,
-                            WrapTextWidth = dlbl.wrap,
-                            HorizontalAlignment = dlbl.ihalign,
-                            VerticalAlignment = dlbl.ivalign,
-                        };
-                        if(dlbl.blend != null) {
-                            options.BlenderMode = dlbl.blend.itype;
-                            options.BlendPercentage = dlbl.blend.fraction;
-                        }
-
-                        ctx.DrawText(options, dlbl.text, font, brush, pen, dlbl.pos);
-                    }
+                    dobj.Draw(imageCtx);
                 }
             });
         }
@@ -103,7 +75,7 @@ namespace ImageGenerator {
             throw new ProcessorException($"Font family '{name}' not found");
         }
 
-        private string GetActualPath(string path) {
+        private string ExpandPath(string path) {
             if(path.StartsWith('@')) {
                 return Path.Combine(TemplateDir, path.Substring(1));
             }
