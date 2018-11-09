@@ -98,7 +98,7 @@ namespace ImageGenerator.Params {
         }
 
         public Label dup() => new Label {
-            pos = pos, text = text, font = font, brush = brush, pen = pen,
+            pos = pos, ang = ang, text = text, font = font, brush = brush, pen = pen,
             blend = blend, wrap = wrap, ihalign = ihalign, ivalign = ivalign
         };
 
