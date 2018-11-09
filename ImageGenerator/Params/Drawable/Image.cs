@@ -17,15 +17,16 @@ namespace ImageGenerator.Params {
 
         public Vec size { get; set; }
 
-        public Blend blend { get; set; }
-
-        public Image dup() => new Image { pos = pos, ang = ang, file = file, size = size, blend = blend };
+        public Image dup() => new Image {
+            pos = pos, ang = ang, blend = blend,
+            file = file, size = size,
+        };
 
         [MoonSharpHidden]
         public Image() { /* Default constructor */ }
 
         [MoonSharpHidden]
-        public Image(DynValue param) {
+        public Image(DynValue param) : base(param) {
             var table = param
                         .CheckType(nameof(Image), DataType.Table, 1)
                         .Table;
@@ -34,16 +35,6 @@ namespace ImageGenerator.Params {
                         .Get(nameof(file))
                         .CheckType(nameof(Image), DataType.String)
                         .String;
-
-            this.pos = table
-                       .Get(nameof(pos))
-                       .CheckUserDataType<Vec>(nameof(Image));
-
-            this.ang = (float)table
-                       .Get(nameof(ang))
-                       .CheckType(nameof(Image), DataType.Number,
-                           flags: TypeValidationFlags.AllowNil)
-                       .Number;
 
             this.size = table
                         .Get(nameof(size))

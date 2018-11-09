@@ -63,8 +63,6 @@ namespace ImageGenerator.Params {
 
         public Pen pen { get; set; }
 
-        public Blend blend { get; set; }
-
         public float wrap { get; set; }
 
         [MoonSharpHidden]
@@ -98,22 +96,19 @@ namespace ImageGenerator.Params {
         }
 
         public Label dup() => new Label {
-            pos = pos, ang = ang, text = text, font = font, brush = brush, pen = pen,
-            blend = blend, wrap = wrap, ihalign = ihalign, ivalign = ivalign
+            pos = pos, ang = ang, blend = blend,
+            text = text, font = font, brush = brush, pen = pen,
+            wrap = wrap, ihalign = ihalign, ivalign = ivalign,
         };
 
         [MoonSharpHidden]
         public Label() { /* Default constructor */ }
 
         [MoonSharpHidden]
-        public Label(DynValue param) {
+        public Label(DynValue param) : base(param) {
             var table = param
                         .CheckType(nameof(Label), DataType.Table, 1)
                         .Table;
-
-            this.pos = table
-                       .Get(nameof(pos))
-                       .CheckUserDataType<Vec>(nameof(Label));
 
             this.text = table
                         .Get(nameof(text))
@@ -133,11 +128,6 @@ namespace ImageGenerator.Params {
                        .Get(nameof(pen))
                        .CheckUserDataType<Pen>(nameof(Label),
                            flags: TypeValidationFlags.AllowNil);
-
-            this.blend = table
-                         .Get(nameof(blend))
-                         .CheckUserDataType<Blend>(nameof(Image),
-                             flags: TypeValidationFlags.AllowNil);
 
             this.wrap = (float)table
                         .Get(nameof(wrap))
@@ -172,6 +162,7 @@ namespace ImageGenerator.Params {
                 HorizontalAlignment = this.ihalign,
                 VerticalAlignment = this.ivalign,
             };
+
             if(this.blend != null) {
                 options.BlenderMode = this.blend.itype;
                 options.BlendPercentage = this.blend.fraction;
